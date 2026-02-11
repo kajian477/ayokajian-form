@@ -391,7 +391,7 @@
   // ======= API calls =======
   async function callApi(action, data){
     const key = getKey();
-    if(!key) throw new Error("API Key kosong. Isi dulu di Koneksi API.");
+    if(!key) throw new Error("Kode masih kosong. Isi dulu kode kemudian klik menyambung.");
 
     const res = await fetch(SCRIPT_URL, {
       method:"POST",
