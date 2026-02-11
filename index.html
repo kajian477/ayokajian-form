@@ -107,8 +107,8 @@
 
 <body>
   <header>
-    <p class="title">Ayo Kajian — Admin (GitHub)</p>
-    <p class="sub">Script URL sudah dikunci. Admin cukup input API Key.</p>
+    <p class="title">Ayo Kajian — Admin</p>
+    <p class="sub">Masukkan Kode, Kemudian Isi Jadwal Kajian.</p>
   </header>
 
   <div class="wrap">
@@ -308,7 +308,7 @@
   function setConnectedUI(isOk){
     const pill = el("connPill");
     pill.className = "pill " + (isOk ? "ok" : "bad");
-    pill.textContent = isOk ? "Connected" : "Not connected";
+    pill.textContent = isOk ? "Tersambung" : "Belum Tersambung";
   }
 
   function fillSelect(selectEl, items, placeholder="-- pilih --"){
@@ -421,7 +421,7 @@
       try{ json = JSON.parse(text); }catch{ throw new Error("Healthcheck bukan JSON."); }
       if(!json.ok) throw new Error(json.message || "Healthcheck gagal.");
       setConnectedUI(true);
-      setToast("connToast", `Tersambung ✅\nSheet: ${json.data.sheetName}`);
+      setToast("connToast", `Tersambung ✅\nDatabase: ${json.data.sheetName}`);
     }catch(err){
       setConnectedUI(false);
       setToast("connToast", err.message || String(err), false);
