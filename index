@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Form Kajian - AyoKajian</title>
+
+<style>
+body{
+  font-family: Arial, sans-serif;
+  background:#f4f6f9;
+  margin:0;
+  padding:20px;
+}
+.container{
+  max-width:900px;
+  margin:auto;
+}
+h1{
+  text-align:center;
+}
+.card{
+  background:white;
+  padding:20px;
+  border-radius:10px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.05);
+  margin-bottom:20px;
+}
+input, select, textarea, button{
+  width:100%;
+  padding:10px;
+  margin-top:8px;
+  margin-bottom:15px;
+  border-radius:6px;
+  border:1px solid #ddd;
+  font-size:14px;
+}
+button{
+  background:#111827;
+  color:white;
+  border:none;
+  cursor:pointer;
+}
+button:hover{
+  opacity:0.9;
+}
+.result-item{
+  padding:10px;
+  border-bottom:1px solid #eee;
+}
+.toast{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#16a34a;
+  color:white;
+  padding:12px 20px;
+  border-radius:6px;
+  display:none;
+}
+.toast.error{
+  background:#dc2626;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<h1>Form Kajian AyoKajian</h1>
+
+<div class="card">
+<h2>Tambah Kajian</h2>
+
+<form id="kajianForm">
+
+<label>Judul Kajian</label>
+<input type="text" name="title" required>
+
+<label>Ustadz</label>
+<input type="text" name="ustadz" required>
+
+<label>Topik</label>
+<input type="text" name="topic">
+
+<label>Tanggal</label>
+<input type="date" name="date" required>
+
+<label>Jam</label>
+<input type="time" name="time" required>
+
+<label>Mode</label>
+<select name="mode">
+  <option value="Offline">Offline</option>
+  <option value="Online">Online</option>
+  <option value="Hybrid">Hybrid</option>
+</select>
+
+<label>Tempat</label>
+<input type="text" name="place">
+
+<label>Alamat</label>
+<textarea name="address"></textarea>
+
+<label>Link Maps</label>
+<input type="text" name="mapsUrl">
+
+<label>Link Streaming</label>
+<input type="text" name="streamUrl">
+
+<label>Link Pendaftaran</label>
+<input type="text" name="registerUrl">
+
+<label>Catatan</label>
+<textarea name="notes"></textarea>
+
+<button type="submit">Simpan Kajian</button>
+</form>
+</div>
+
+<div class="card">
+<h2>Cari Kajian Berdasarkan Ustadz</h2>
+
+<input type="text" id="searchInput" placeholder="Masukkan nama ustadz">
+<button onclick="searchKajian()">Cari</button>
+
+<div id="resultArea"></div>
+</div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+
+// =====================
+// GANTI DENGAN API KAMU
+// =====================
+const API_URL = "PASTE_URL_APPS_SCRIPT_KAMU_DISINI";
+
+// =====================
+// SUBMIT FORM
+// =====================
+
+document.getElementById("kajianForm").addEventListener("submit", function(e){
+  e.preventDefault();
+
+  const formData = new FormData(this);
+  const data = Object.fromEntries(formData.entries());
+
+  fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  })
+  .then(res => res.json())
+  .then(res => {
+    if(res.ok){
+      showToast("Kajian berhasil disimpan!");
+      this.reset();
+    }else{
+      showToast(res.error || "Terjadi kesalahan", true);
+    }
+  })
+  .catch(err=>{
+    showToast("Koneksi gagal", true);
+  });
+
+});
+
+// =====================
+// SEARCH
+// =====================
+
+function searchKajian(){
+  const name = document.getElementById("searchInput").value.trim();
+  if(!name) return;
+
+  fetch(API_URL + "?action=search&name=" + encodeURIComponent(name))
+  .then(res=>res.json())
+  .then(data=>{
+    const area = document.getElementById("resultArea");
+    area.innerHTML="";
+
+    if(!data || data.length === 0){
+      area.innerHTML="<p>Tidak ditemukan.</p>";
+      return;
+    }
+
+    data.forEach(item=>{
+      area.innerHTML += `
+        <div class="result-item">
+          <strong>${item.title}</strong><br>
+          Ustadz: ${item.ustadz}<br>
+          Tanggal: ${item.date} ${item.time}<br>
+          Mode: ${item.mode}<br>
+          Tempat: ${item.place}
+        </div>
+      `;
+    });
+  });
+}
+
+// =====================
+// TOAST
+// =====================
+
+function showToast(message, isError=false){
+  const toast = document.getElementById("toast");
+  toast.innerText = message;
+  toast.className = isError ? "toast error" : "toast";
+  toast.style.display="block";
+
+  setTimeout(()=>{
+    toast.style.display="none";
+  },3000);
+}
+
+</script>
+
+</body>
+</html>
