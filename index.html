@@ -1,222 +1,270 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Form Kajian - AyoKajian</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>AyoKajian — API Connector</title>
 
 <style>
+:root{
+  --bg:#f6f7fb;
+  --card:#ffffff;
+  --border:#e2e8f0;
+  --text:#0f172a;
+  --muted:#64748b;
+  --accent:#2563eb;
+  --good:#16a34a;
+  --bad:#ef4444;
+}
+
+*{box-sizing:border-box}
 body{
-  font-family: Arial, sans-serif;
-  background:#f4f6f9;
   margin:0;
-  padding:20px;
+  background:var(--bg);
+  font-family:system-ui;
 }
-.container{
-  max-width:900px;
+
+.wrap{
+  max-width:720px;
   margin:auto;
+  padding:24px;
 }
-h1{
-  text-align:center;
-}
+
 .card{
-  background:white;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
   padding:20px;
-  border-radius:10px;
-  box-shadow:0 4px 10px rgba(0,0,0,0.05);
-  margin-bottom:20px;
 }
-input, select, textarea, button{
+
+h1{
+  margin:0 0 6px;
+  font-size:20px;
+}
+
+.sub{
+  margin:0 0 20px;
+  color:var(--muted);
+  font-size:13px;
+}
+
+label{
+  font-weight:700;
+  font-size:13px;
+  display:block;
+  margin:14px 0 6px;
+}
+
+input{
   width:100%;
-  padding:10px;
-  margin-top:8px;
-  margin-bottom:15px;
-  border-radius:6px;
-  border:1px solid #ddd;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid var(--border);
   font-size:14px;
 }
+
+.actions{
+  display:flex;
+  gap:10px;
+  margin-top:18px;
+  flex-wrap:wrap;
+}
+
 button{
+  border:none;
+  padding:12px 16px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:800;
+}
+
+.primary{
+  background:var(--accent);
+  color:white;
+}
+
+.save{
   background:#111827;
   color:white;
-  border:none;
-  cursor:pointer;
 }
-button:hover{
-  opacity:0.9;
+
+.status{
+  margin-top:16px;
+  font-weight:700;
 }
-.result-item{
-  padding:10px;
-  border-bottom:1px solid #eee;
-}
-.toast{
-  position:fixed;
-  bottom:20px;
-  right:20px;
-  background:#16a34a;
-  color:white;
-  padding:12px 20px;
-  border-radius:6px;
-  display:none;
-}
-.toast.error{
-  background:#dc2626;
+
+.good{ color:var(--good); }
+.bad{ color:var(--bad); }
+
+.small{
+  margin-top:8px;
+  font-size:12px;
+  color:var(--muted);
 }
 </style>
 </head>
+
 <body>
 
-<div class="container">
+<div class="wrap">
+  <div class="card">
 
-<h1>Form Kajian AyoKajian</h1>
+    <h1>🔌 AyoKajian API Connector</h1>
+    <p class="sub">
+      Hubungkan GitHub Pages ke Apps Script API kamu.
+    </p>
 
-<div class="card">
-<h2>Tambah Kajian</h2>
+    <label>Script URL (Web App /exec)</label>
+    <input id="scriptUrl"
+      placeholder="https://script.google.com/macros/s/XXXX/exec"/>
 
-<form id="kajianForm">
+    <label>API Key</label>
+    <input id="apiKey"
+      placeholder="Masukkan API key"/>
 
-<label>Judul Kajian</label>
-<input type="text" name="title" required>
+    <div class="actions">
+      <button class="save" onclick="saveConfig()">
+        💾 Simpan Config
+      </button>
 
-<label>Ustadz</label>
-<input type="text" name="ustadz" required>
+      <button class="primary" onclick="testConnection()">
+        🚀 Test Connection
+      </button>
 
-<label>Topik</label>
-<input type="text" name="topic">
+      <button onclick="clearConfig()">
+        🗑 Reset
+      </button>
+    </div>
 
-<label>Tanggal</label>
-<input type="date" name="date" required>
+    <div id="status" class="status"></div>
 
-<label>Jam</label>
-<input type="time" name="time" required>
+    <div class="small">
+      Config tersimpan di browser (localStorage).
+    </div>
 
-<label>Mode</label>
-<select name="mode">
-  <option value="Offline">Offline</option>
-  <option value="Online">Online</option>
-  <option value="Hybrid">Hybrid</option>
-</select>
-
-<label>Tempat</label>
-<input type="text" name="place">
-
-<label>Alamat</label>
-<textarea name="address"></textarea>
-
-<label>Link Maps</label>
-<input type="text" name="mapsUrl">
-
-<label>Link Streaming</label>
-<input type="text" name="streamUrl">
-
-<label>Link Pendaftaran</label>
-<input type="text" name="registerUrl">
-
-<label>Catatan</label>
-<textarea name="notes"></textarea>
-
-<button type="submit">Simpan Kajian</button>
-</form>
+  </div>
 </div>
 
-<div class="card">
-<h2>Cari Kajian Berdasarkan Ustadz</h2>
-
-<input type="text" id="searchInput" placeholder="Masukkan nama ustadz">
-<button onclick="searchKajian()">Cari</button>
-
-<div id="resultArea"></div>
-</div>
-
-</div>
-
-<div class="toast" id="toast"></div>
 
 <script>
 
-// =====================
-// GANTI DENGAN API KAMU
-// =====================
-const API_URL = "https://script.google.com/macros/s/AKfycbyJhdl-mWIff0vsBvaN18KN8UfStS-a-Chj23Jlufp_LEHtwAsNV9molYlz4KbuXytz/exec";
+// ============================
+// AUTO LOAD CONFIG
+// ============================
 
-// =====================
-// SUBMIT FORM
-// =====================
+window.onload = () => {
 
-document.getElementById("kajianForm").addEventListener("submit", function(e){
-  e.preventDefault();
+  const url = localStorage.getItem("AYOKAJIAN_SCRIPT");
+  const key = localStorage.getItem("AYOKAJIAN_KEY");
 
-  const formData = new FormData(this);
-  const data = Object.fromEntries(formData.entries());
+  if(url) document.getElementById("scriptUrl").value = url;
+  if(key) document.getElementById("apiKey").value = key;
 
-  fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  })
-  .then(res => res.json())
-  .then(res => {
-    if(res.ok){
-      showToast("Kajian berhasil disimpan!");
-      this.reset();
-    }else{
-      showToast(res.error || "Terjadi kesalahan", true);
-    }
-  })
-  .catch(err=>{
-    showToast("Koneksi gagal", true);
-  });
+};
 
-});
 
-// =====================
-// SEARCH
-// =====================
+// ============================
+// SAVE
+// ============================
 
-function searchKajian(){
-  const name = document.getElementById("searchInput").value.trim();
-  if(!name) return;
+function saveConfig(){
 
-  fetch(API_URL + "?action=search&name=" + encodeURIComponent(name))
-  .then(res=>res.json())
-  .then(data=>{
-    const area = document.getElementById("resultArea");
-    area.innerHTML="";
+  const url = document.getElementById("scriptUrl").value.trim();
+  const key = document.getElementById("apiKey").value.trim();
 
-    if(!data || data.length === 0){
-      area.innerHTML="<p>Tidak ditemukan.</p>";
-      return;
-    }
+  if(!url || !key){
+    setStatus("Isi Script URL dan API Key dulu.", false);
+    return;
+  }
 
-    data.forEach(item=>{
-      area.innerHTML += `
-        <div class="result-item">
-          <strong>${item.title}</strong><br>
-          Ustadz: ${item.ustadz}<br>
-          Tanggal: ${item.date} ${item.time}<br>
-          Mode: ${item.mode}<br>
-          Tempat: ${item.place}
-        </div>
-      `;
-    });
-  });
+  localStorage.setItem("AYOKAJIAN_SCRIPT", url);
+  localStorage.setItem("AYOKAJIAN_KEY", key);
+
+  setStatus("Config tersimpan ✔", true);
 }
 
-// =====================
-// TOAST
-// =====================
 
-function showToast(message, isError=false){
-  const toast = document.getElementById("toast");
-  toast.innerText = message;
-  toast.className = isError ? "toast error" : "toast";
-  toast.style.display="block";
+// ============================
+// RESET
+// ============================
 
-  setTimeout(()=>{
-    toast.style.display="none";
-  },3000);
+function clearConfig(){
+
+  localStorage.removeItem("AYOKAJIAN_SCRIPT");
+  localStorage.removeItem("AYOKAJIAN_KEY");
+
+  document.getElementById("scriptUrl").value="";
+  document.getElementById("apiKey").value="";
+
+  setStatus("Config dihapus.", true);
+}
+
+
+// ============================
+// STATUS UI
+// ============================
+
+function setStatus(msg, good){
+  const el = document.getElementById("status");
+  el.className = "status " + (good ? "good" : "bad");
+  el.innerText = (good ? "✅ " : "❌ ") + msg;
+}
+
+
+// ============================
+// TEST CONNECTION
+// ============================
+
+async function testConnection(){
+
+  const url = document.getElementById("scriptUrl").value.trim();
+  const key = document.getElementById("apiKey").value.trim();
+
+  if(!url || !key){
+    setStatus("Script URL / API Key kosong.", false);
+    return;
+  }
+
+  setStatus("Testing connection...", true);
+
+  try{
+
+    const res = await fetch(
+      `${url}?key=${encodeURIComponent(key)}`
+    );
+
+    const text = await res.text();
+
+    let json;
+
+    try{
+      json = JSON.parse(text);
+    }catch{
+      throw new Error("Response bukan JSON.");
+    }
+
+    if(json.ok){
+
+      setStatus(
+        "Connected! API siap dipakai 🚀",
+        true
+      );
+
+    }else{
+      throw new Error(json.message || "API error");
+    }
+
+  }catch(err){
+
+    setStatus(
+      "Connection gagal: " + err.message,
+      false
+    );
+
+  }
+
 }
 
 </script>
-
 </body>
 </html>
