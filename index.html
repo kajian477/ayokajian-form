@@ -413,7 +413,7 @@
       setConnectedUI(false);
       return;
     }
-    setToast("connToast","Testing connection...");
+    setToast("connToast","Sedang Menyambung...");
     try{
       const res = await fetch(`${SCRIPT_URL}?key=${encodeURIComponent(key)}`);
       const text = await res.text();
