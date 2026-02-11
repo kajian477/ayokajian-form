@@ -1,270 +1,581 @@
 <!doctype html>
 <html lang="id">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>AyoKajian — API Connector</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Ayo Kajian — GitHub Admin</title>
 
-<style>
-:root{
-  --bg:#f6f7fb;
-  --card:#ffffff;
-  --border:#e2e8f0;
-  --text:#0f172a;
-  --muted:#64748b;
-  --accent:#2563eb;
-  --good:#16a34a;
-  --bad:#ef4444;
-}
+  <style>
+    :root{
+      --bg:#f6f7fb; --card:#fff; --text:#0f172a; --muted:#64748b;
+      --border:#e2e8f0; --accent:#2563eb; --good:#16a34a; --bad:#ef4444;
+      --r:14px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+    header{
+      background:#fff; border-bottom:1px solid var(--border);
+      padding:12px 14px;
+    }
+    .title{ margin:0; font-weight:900; font-size:14px; }
+    .sub{ margin:4px 0 0; font-size:12px; color:var(--muted); }
 
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:var(--bg);
-  font-family:system-ui;
-}
+    .wrap{ max-width:720px; margin:0 auto; padding:12px 12px 24px; }
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--r);
+      padding:14px;
+      margin:0 0 12px;
+    }
+    .cardTitle{ margin:0; font-weight:900; font-size:14px; }
+    .cardHint{ margin:4px 0 0; font-size:12px; color:var(--muted); }
 
-.wrap{
-  max-width:720px;
-  margin:auto;
-  padding:24px;
-}
+    .grid{ display:grid; grid-template-columns:1fr; gap:10px; margin-top:10px; }
+    label{ display:block; font-size:12px; color:var(--muted); font-weight:800; margin:0 0 6px; }
 
-.card{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:20px;
-}
+    input, select, textarea{
+      width:100%; padding:12px 12px;
+      border:1px solid var(--border);
+      border-radius:12px;
+      background:#fff; color:var(--text);
+      outline:none; font-size:16px;
+    }
+    textarea{ min-height:110px; resize:vertical; }
+    .row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
-h1{
-  margin:0 0 6px;
-  font-size:20px;
-}
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
+    button{
+      border:1px solid var(--border);
+      background:#fff; color:var(--text);
+      border-radius:12px;
+      padding:12px 14px;
+      font-weight:900; font-size:14px;
+      cursor:pointer;
+    }
+    button:disabled{ opacity:.6; cursor:not-allowed; }
+    .primary{ border-color:transparent; background:var(--accent); color:#fff; }
+    .toast{ margin-top:10px; font-size:13px; white-space:pre-line; }
+    .toast.ok{ color:var(--good); }
+    .toast.bad{ color:var(--bad); }
 
-.sub{
-  margin:0 0 20px;
-  color:var(--muted);
-  font-size:13px;
-}
+    .result{
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:12px;
+      margin-top:10px;
+      background:#fff;
+    }
+    .resultTitle{ margin:0 0 4px; font-weight:900; font-size:14px; }
+    .resultMeta{ margin:0; font-size:12px; color:var(--muted); line-height:1.35; }
+    .resultBtns{ margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; }
+    .mini{ padding:10px 12px; font-size:13px; border-radius:12px; }
 
-label{
-  font-weight:700;
-  font-size:13px;
-  display:block;
-  margin:14px 0 6px;
-}
-
-input{
-  width:100%;
-  padding:12px;
-  border-radius:10px;
-  border:1px solid var(--border);
-  font-size:14px;
-}
-
-.actions{
-  display:flex;
-  gap:10px;
-  margin-top:18px;
-  flex-wrap:wrap;
-}
-
-button{
-  border:none;
-  padding:12px 16px;
-  border-radius:10px;
-  cursor:pointer;
-  font-weight:800;
-}
-
-.primary{
-  background:var(--accent);
-  color:white;
-}
-
-.save{
-  background:#111827;
-  color:white;
-}
-
-.status{
-  margin-top:16px;
-  font-weight:700;
-}
-
-.good{ color:var(--good); }
-.bad{ color:var(--bad); }
-
-.small{
-  margin-top:8px;
-  font-size:12px;
-  color:var(--muted);
-}
-</style>
+    input[type="hidden"]{ display:none !important; }
+    .pill{ display:inline-block; font-size:12px; padding:6px 10px; border-radius:999px; border:1px solid var(--border); }
+    .pill.ok{ border-color:rgba(22,163,74,.25); color:var(--good); background:rgba(22,163,74,.06); }
+    .pill.bad{ border-color:rgba(239,68,68,.25); color:var(--bad); background:rgba(239,68,68,.06); }
+  </style>
 </head>
 
 <body>
+  <header>
+    <p class="title">Ayo Kajian — GitHub Admin</p>
+    <p class="sub">Tambah & Edit data kajian via Apps Script API</p>
+  </header>
 
-<div class="wrap">
-  <div class="card">
+  <div class="wrap">
 
-    <h1>🔌 AyoKajian API Connector</h1>
-    <p class="sub">
-      Hubungkan GitHub Pages ke Apps Script API kamu.
-    </p>
+    <!-- CONNECTION -->
+    <section class="card">
+      <p class="cardTitle">Koneksi API</p>
+      <p class="cardHint">Isi Script URL & API Key. Disimpan di browser (localStorage).</p>
 
-    <label>Script URL (Web App /exec)</label>
-    <input id="scriptUrl"
-      placeholder="https://https://script.google.com/macros/s/AKfycby8BUFq4WF_9C5HsglCLOGykN7g_KpEBUMifnQj9Fgiv8fxP-xhWRxc0N6R0ZwJP8G9/exec"/>
+      <div class="grid">
+        <div>
+          <label>Script URL (Web App /exec) *</label>
+          <input id="scriptUrl" placeholder="https://script.google.com/macros/s/XXXX/exec" />
+        </div>
+        <div>
+          <label>API Key *</label>
+          <input id="apiKey" type="password" placeholder="Masukkan API key" />
+        </div>
+        <div>
+          <span id="connPill" class="pill bad">Not connected</span>
+        </div>
+      </div>
 
-    <label>API Key</label>
-    <input id="apiKey"
-      placeholder="Masukkan API key"/>
+      <div class="actions">
+        <button class="primary" type="button" onclick="saveConfig()">Simpan</button>
+        <button type="button" onclick="testConnection()">Test Connection</button>
+        <button type="button" onclick="clearConfig()">Reset</button>
+      </div>
 
-    <div class="actions">
-      <button class="save" onclick="saveConfig()">
-        💾 Simpan Config
-      </button>
+      <div class="toast" id="connToast"></div>
+    </section>
 
-      <button class="primary" onclick="testConnection()">
-        🚀 Test Connection
-      </button>
+    <!-- ADD -->
+    <section class="card" id="cardAdd">
+      <p class="cardTitle">Tambah Kajian</p>
+      <p class="cardHint">Input jadwal kajian.</p>
 
-      <button onclick="clearConfig()">
-        🗑 Reset
-      </button>
-    </div>
+      <form id="form" onsubmit="handleSubmit(event)">
+        <input type="hidden" name="mapsUrl" value="">
+        <input type="hidden" name="streamUrl" value="">
+        <input type="hidden" name="registerUrl" value="">
 
-    <div id="status" class="status"></div>
+        <div class="grid">
+          <div>
+            <label>Judul Kajian *</label>
+            <input name="title" required placeholder="Judul kajian" />
+          </div>
 
-    <div class="small">
-      Config tersimpan di browser (localStorage).
-    </div>
+          <div>
+            <label>Nama Ustadz *</label>
+            <input name="ustadz" required placeholder="Contoh: Ustadz Fulan" />
+          </div>
+
+          <div>
+            <label>Tema/Topik *</label>
+            <input name="topic" required placeholder="Tema/topik" />
+          </div>
+
+          <div>
+            <label>Mode *</label>
+            <select name="mode" id="mode" required></select>
+          </div>
+
+          <div class="row2">
+            <div>
+              <label>Tanggal *</label>
+              <input type="date" name="date" required />
+            </div>
+            <div>
+              <label>Waktu *</label>
+              <select name="time" id="timeSelect" required></select>
+            </div>
+          </div>
+
+          <div>
+            <label>Tempat/Lokasi</label>
+            <input name="place" placeholder="Contoh: Masjid Ahmad Yani" />
+          </div>
+
+          <div>
+            <label>Alamat</label>
+            <input name="address" placeholder="Contoh: Mulyorejo - Surabaya" />
+          </div>
+
+          <div>
+            <label>Keterangan</label>
+            <textarea name="notes" placeholder="Catatan tambahan"></textarea>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="primary" id="btnSave" type="submit">Simpan</button>
+          <button type="button" onclick="resetForm()">Reset</button>
+        </div>
+
+        <div class="toast" id="toast"></div>
+      </form>
+    </section>
+
+    <!-- EDIT -->
+    <section class="card" id="cardEditUstadz">
+      <p class="cardTitle">Edit (By Ustadz)</p>
+      <p class="cardHint">Ketik nama ustadz → cari → pilih kajian.</p>
+
+      <label>Nama Ustadz</label>
+      <input id="findUstadz" placeholder="contoh: Ustadz Fulan"
+             onkeydown="if(event.key==='Enter'){event.preventDefault(); searchUstadz();}" />
+
+      <div class="actions">
+        <button class="primary" id="btnSearchU" type="button" onclick="searchUstadz()">Cari</button>
+        <button type="button" onclick="clearUstadz()">Clear</button>
+      </div>
+
+      <div class="toast" id="ustadzToast"></div>
+      <div id="ustadzResults"></div>
+
+      <form id="editForm" onsubmit="saveEdit(event)" style="margin-top:12px; display:none;">
+        <input type="hidden" name="id" id="editId">
+
+        <input type="hidden" name="mapsUrl" id="editMapsUrl" value="">
+        <input type="hidden" name="streamUrl" id="editStreamUrl" value="">
+        <input type="hidden" name="registerUrl" id="editRegisterUrl" value="">
+
+        <div class="grid">
+          <div>
+            <label>Judul Kajian *</label>
+            <input name="title" id="editTitle" required />
+          </div>
+
+          <div>
+            <label>Nama Ustadz *</label>
+            <input name="ustadz" id="editUstadz" required />
+          </div>
+
+          <div>
+            <label>Tema/Topik *</label>
+            <input name="topic" id="editTopic" required />
+          </div>
+
+          <div>
+            <label>Mode *</label>
+            <select name="mode" id="editMode" required></select>
+          </div>
+
+          <div class="row2">
+            <div>
+              <label>Tanggal *</label>
+              <input type="date" name="date" id="editDate" required />
+            </div>
+            <div>
+              <label>Waktu *</label>
+              <select name="time" id="editTimeSelect" required></select>
+            </div>
+          </div>
+
+          <div>
+            <label>Tempat/Lokasi</label>
+            <input name="place" id="editPlace" />
+          </div>
+
+          <div>
+            <label>Alamat</label>
+            <input name="address" id="editAddress" />
+          </div>
+
+          <div>
+            <label>Keterangan</label>
+            <textarea name="notes" id="editNotes"></textarea>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="primary" id="btnUpdate" type="submit">Simpan Perubahan</button>
+          <button type="button" onclick="cancelEdit()">Batal</button>
+        </div>
+
+        <div class="toast" id="editToast"></div>
+      </form>
+    </section>
 
   </div>
-</div>
-
 
 <script>
+  const MODE = ["Offline","Online"];
+  const el = (id)=>document.getElementById(id);
 
-// ============================
-// AUTO LOAD CONFIG
-// ============================
-
-window.onload = () => {
-
-  const url = localStorage.getItem("AYOKAJIAN_SCRIPT");
-  const key = localStorage.getItem("AYOKAJIAN_KEY");
-
-  if(url) document.getElementById("scriptUrl").value = url;
-  if(key) document.getElementById("apiKey").value = key;
-
-};
-
-
-// ============================
-// SAVE
-// ============================
-
-function saveConfig(){
-
-  const url = document.getElementById("scriptUrl").value.trim();
-  const key = document.getElementById("apiKey").value.trim();
-
-  if(!url || !key){
-    setStatus("Isi Script URL dan API Key dulu.", false);
-    return;
+  function setToast(id, msg, ok=true){
+    const t = el(id);
+    t.className = "toast " + (ok ? "ok" : "bad");
+    t.textContent = (ok ? "✅ " : "❌ ") + msg;
   }
 
-  localStorage.setItem("AYOKAJIAN_SCRIPT", url);
-  localStorage.setItem("AYOKAJIAN_KEY", key);
-
-  setStatus("Config tersimpan ✔", true);
-}
-
-
-// ============================
-// RESET
-// ============================
-
-function clearConfig(){
-
-  localStorage.removeItem("AYOKAJIAN_SCRIPT");
-  localStorage.removeItem("AYOKAJIAN_KEY");
-
-  document.getElementById("scriptUrl").value="";
-  document.getElementById("apiKey").value="";
-
-  setStatus("Config dihapus.", true);
-}
-
-
-// ============================
-// STATUS UI
-// ============================
-
-function setStatus(msg, good){
-  const el = document.getElementById("status");
-  el.className = "status " + (good ? "good" : "bad");
-  el.innerText = (good ? "✅ " : "❌ ") + msg;
-}
-
-
-// ============================
-// TEST CONNECTION
-// ============================
-
-async function testConnection(){
-
-  const url = document.getElementById("scriptUrl").value.trim();
-  const key = document.getElementById("apiKey").value.trim();
-
-  if(!url || !key){
-    setStatus("Script URL / API Key kosong.", false);
-    return;
+  function setConnectedUI(isOk){
+    const pill = el("connPill");
+    pill.className = "pill " + (isOk ? "ok" : "bad");
+    pill.textContent = isOk ? "Connected" : "Not connected";
   }
 
-  setStatus("Testing connection...", true);
+  function fillSelect(selectEl, items, placeholder="-- pilih --"){
+    selectEl.innerHTML = "";
+    const opt0 = document.createElement("option");
+    opt0.value = ""; opt0.textContent = placeholder;
+    selectEl.appendChild(opt0);
+    items.forEach(v=>{
+      const o=document.createElement("option");
+      o.value=v; o.textContent=v;
+      selectEl.appendChild(o);
+    });
+  }
 
-  try{
+  function fillTimeSelect(selectEl, step=30){
+    selectEl.innerHTML = '<option value="">-- pilih --</option>';
+    for(let h=0; h<24; h++){
+      for(let m=0; m<60; m+=step){
+        const hh = String(h).padStart(2,'0');
+        const mm = String(m).padStart(2,'0');
+        const val = `${hh}:${mm}`;
+        const opt = document.createElement("option");
+        opt.value = val;
+        opt.textContent = val;
+        selectEl.appendChild(opt);
+      }
+    }
+  }
 
-    const res = await fetch(
-      `${url}?key=${encodeURIComponent(key)}`
-    );
+  function presetTime(){
+    const d = new Date();
+    const step = 30;
+    let h = d.getHours();
+    let m = d.getMinutes();
+    m = Math.ceil((m+1)/step)*step;
+    if (m >= 60){ m = 0; h = (h+1) % 24; }
+    el("timeSelect").value = String(h).padStart(2,'0') + ":" + String(m).padStart(2,'0');
+  }
+
+  function resetForm(){
+    el("form").reset();
+    fillSelect(el("mode"), MODE);
+    presetTime();
+    setToast("toast","Form direset.");
+  }
+
+  function formToObj(formId){
+    const fd = new FormData(el(formId));
+    const obj = Object.fromEntries(fd.entries());
+    Object.keys(obj).forEach(k=>{
+      if (typeof obj[k] === "string") obj[k] = obj[k].trim();
+    });
+    return obj;
+  }
+
+  // ========= config =========
+  function loadConfig(){
+    el("scriptUrl").value = localStorage.getItem("AYOKAJIAN_SCRIPT") || "";
+    el("apiKey").value = localStorage.getItem("AYOKAJIAN_KEY") || "";
+  }
+
+  function saveConfig(){
+    const url = el("scriptUrl").value.trim();
+    const key = el("apiKey").value.trim();
+    if(!url || !key){
+      setToast("connToast","Script URL & API Key wajib diisi.", false);
+      setConnectedUI(false);
+      return;
+    }
+    localStorage.setItem("AYOKAJIAN_SCRIPT", url);
+    localStorage.setItem("AYOKAJIAN_KEY", key);
+    setToast("connToast","Config tersimpan.");
+  }
+
+  function clearConfig(){
+    localStorage.removeItem("AYOKAJIAN_SCRIPT");
+    localStorage.removeItem("AYOKAJIAN_KEY");
+    el("scriptUrl").value = "";
+    el("apiKey").value = "";
+    setConnectedUI(false);
+    setToast("connToast","Config direset.");
+  }
+
+  function getScriptUrl(){ return (el("scriptUrl").value || localStorage.getItem("AYOKAJIAN_SCRIPT") || "").trim(); }
+  function getApiKey(){ return (el("apiKey").value || localStorage.getItem("AYOKAJIAN_KEY") || "").trim(); }
+
+  // ========= API =========
+  async function callApi(action, data){
+    const url = getScriptUrl();
+    const key = getApiKey();
+    if(!url) throw new Error("Script URL kosong.");
+    if(!key) throw new Error("API Key kosong.");
+
+    const res = await fetch(url, {
+      method:"POST",
+      headers:{ "Content-Type":"text/plain;charset=utf-8" },
+      body: JSON.stringify({ key, action, data })
+    });
 
     const text = await res.text();
-
     let json;
+    try{ json = JSON.parse(text); }catch{ throw new Error("Response bukan JSON:\n" + text.slice(0,200)); }
 
-    try{
-      json = JSON.parse(text);
-    }catch{
-      throw new Error("Response bukan JSON.");
-    }
-
-    if(json.ok){
-
-      setStatus(
-        "Connected! API siap dipakai 🚀",
-        true
-      );
-
-    }else{
-      throw new Error(json.message || "API error");
-    }
-
-  }catch(err){
-
-    setStatus(
-      "Connection gagal: " + err.message,
-      false
-    );
-
+    if(!json.ok) throw new Error(json.message || "API error.");
+    return json.data;
   }
 
-}
+  async function testConnection(){
+    const url = getScriptUrl();
+    const key = getApiKey();
+    if(!url || !key){
+      setToast("connToast","Isi Script URL & API Key dulu.", false);
+      setConnectedUI(false);
+      return;
+    }
 
+    setToast("connToast","Testing connection...");
+    try{
+      const res = await fetch(`${url}?key=${encodeURIComponent(key)}`);
+      const text = await res.text();
+      let json;
+      try{ json = JSON.parse(text); }catch{ throw new Error("Healthcheck bukan JSON."); }
+      if(!json.ok) throw new Error(json.message || "Healthcheck gagal.");
+      setConnectedUI(true);
+      setToast("connToast", `Connected ✅\nSheet: ${json.data.sheetName}`);
+    }catch(err){
+      setConnectedUI(false);
+      setToast("connToast", err.message || String(err), false);
+    }
+  }
+
+  // ========= ADD =========
+  async function handleSubmit(e){
+    e.preventDefault();
+    const data = formToObj("form");
+
+    if ((data.title||"").length < 3 || (data.topic||"").length < 3) {
+      setToast("toast","Judul & Topik minimal 3 karakter.", false);
+      return;
+    }
+
+    el("btnSave").disabled = true;
+    setToast("toast","Menyimpan...");
+
+    try{
+      await callApi("submitForm", data);
+      el("btnSave").disabled = false;
+      el("form").reset();
+      fillSelect(el("mode"), MODE);
+      presetTime();
+      setToast("toast","Tersimpan!");
+    }catch(err){
+      el("btnSave").disabled = false;
+      setToast("toast", err.message || String(err), false);
+    }
+  }
+
+  // ========= EDIT =========
+  function clearUstadz(){
+    el("findUstadz").value = "";
+    el("ustadzResults").innerHTML = "";
+    el("ustadzToast").textContent = "";
+    cancelEdit();
+  }
+
+  function cancelEdit(){
+    el("editForm").style.display = "none";
+    el("editToast").textContent = "";
+  }
+
+  async function searchUstadz(){
+    const name = (el("findUstadz").value || "").trim();
+    if(!name){
+      setToast("ustadzToast","Masukkan nama ustadz dulu.", false);
+      return;
+    }
+
+    el("btnSearchU").disabled = true;
+    setToast("ustadzToast","Mencari...");
+    el("ustadzResults").innerHTML = "";
+    cancelEdit();
+
+    try{
+      const rows = await callApi("getByUstadz", { name });
+      el("btnSearchU").disabled = false;
+
+      const arr = rows || [];
+      if(!arr.length){
+        setToast("ustadzToast","Tidak ada data yang cocok.", false);
+        return;
+      }
+
+      setToast("ustadzToast", `Ketemu ${arr.length} data. Pilih untuk edit.`);
+      el("ustadzResults").innerHTML = arr.map(r=>{
+        const safeTitle = escapeHtml(r.title || "");
+        const safeU = escapeHtml(r.ustadz || "");
+        const safeTopic = escapeHtml(r.topic || "");
+        const safeDate = escapeHtml(r.date || "");
+        const safeTime = escapeHtml(r.time || "");
+        const safeMode = escapeHtml(r.mode || "");
+        const safePlace = escapeHtml(r.place || "");
+
+        return `
+          <div class="result">
+            <p class="resultTitle">${safeTitle}</p>
+            <p class="resultMeta">${safeU} • ${safeTopic}</p>
+            <p class="resultMeta">${safeDate} ${safeTime} • ${safeMode} • ${safePlace}</p>
+            <div class="resultBtns">
+              <button type="button" class="mini primary" onclick='pickFromUstadz("${escapeAttr(r.id)}")'>Edit</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }catch(err){
+      el("btnSearchU").disabled = false;
+      setToast("ustadzToast", err.message || String(err), false);
+    }
+  }
+
+  async function pickFromUstadz(id){
+    const clean = (id || "").trim();
+    if(!clean) return;
+
+    setToast("ustadzToast","Loading data untuk edit...");
+
+    try{
+      const row = await callApi("getById", { id: clean });
+      if(!row || !row.id){
+        setToast("ustadzToast","Data tidak ditemukan.", false);
+        return;
+      }
+      loadRowToEdit(row);
+      el("editForm").style.display = "block";
+      setToast("ustadzToast","Data siap diedit.");
+      el("editForm").scrollIntoView({behavior:"smooth", block:"start"});
+    }catch(err){
+      setToast("ustadzToast", err.message || String(err), false);
+    }
+  }
+
+  function loadRowToEdit(row){
+    el("editId").value = row.id || "";
+    el("editTitle").value = row.title || "";
+    el("editUstadz").value = row.ustadz || "";
+    el("editTopic").value = row.topic || "";
+    el("editMode").value = row.mode || "";
+    el("editDate").value = row.date || "";
+    el("editTimeSelect").value = row.time || "";
+    el("editPlace").value = row.place || "";
+    el("editAddress").value = row.address || "";
+
+    el("editMapsUrl").value = (row.mapsUrl || "");
+    el("editStreamUrl").value = (row.streamUrl || "");
+    el("editRegisterUrl").value = (row.registerUrl || "");
+
+    el("editNotes").value = row.notes || "";
+  }
+
+  async function saveEdit(e){
+    e.preventDefault();
+    const payload = formToObj("editForm");
+    if(!payload.id){
+      setToast("editToast","ID internal kosong.", false);
+      return;
+    }
+
+    el("btnUpdate").disabled = true;
+    setToast("editToast","Menyimpan...");
+
+    try{
+      await callApi("updateById", payload);
+      el("btnUpdate").disabled = false;
+      setToast("editToast","Tersimpan!");
+    }catch(err){
+      el("btnUpdate").disabled = false;
+      setToast("editToast", err.message || String(err), false);
+    }
+  }
+
+  function escapeHtml(s){
+    return String(s ?? "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+  function escapeAttr(s){
+    return String(s ?? "").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+  }
+
+  // init
+  fillSelect(el("mode"), MODE);
+  fillSelect(el("editMode"), MODE);
+  fillTimeSelect(el("timeSelect"), 30);
+  fillTimeSelect(el("editTimeSelect"), 30);
+  presetTime();
+  loadConfig();
+  setConnectedUI(false);
 </script>
+
 </body>
 </html>
