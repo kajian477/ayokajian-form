@@ -115,33 +115,35 @@
 
     <!-- CONNECTION -->
     <section class="card">
-      <p class="cardTitle">Koneksi API</p>
-      <p class="cardHint">API Key disimpan di browser (localStorage). Script URL sudah fixed.</p>
+  <!-- Judul & deskripsi disembunyikan -->
+  <p class="cardTitle" style="display:none;">Koneksi API</p>
+  <p class="cardHint" style="display:none;">API Key disimpan di browser (localStorage). Script URL sudah fixed.</p>
 
-      <div class="grid">
-        <div>
-          <label>Script URL (fixed)</label>
-          <div class="mono" id="fixedUrl"></div>
-        </div>
+  <div class="grid">
+    <!-- Script URL disembunyikan -->
+    <div style="display:none;">
+      <label>Script URL (fixed)</label>
+      <div class="mono" id="fixedUrl"></div>
+    </div>
 
-        <div>
-          <label>API Key *</label>
-          <input id="apiKey" type="password" placeholder="Masukkan API key" />
-        </div>
+    <div>
+      <label>API Key *</label>
+      <input id="apiKey" type="password" placeholder="Masukkan API key" />
+    </div>
 
-        <div>
-          <span id="connPill" class="pill bad">Not connected</span>
-        </div>
-      </div>
+    <div>
+      <span id="connPill" class="pill bad">Not connected</span>
+    </div>
+  </div>
 
-      <div class="actions">
-        <button class="primary" type="button" onclick="saveKey()">Simpan API Key</button>
-        <button type="button" onclick="testConnection()">Test Connection</button>
-        <button type="button" onclick="clearKey()">Reset</button>
-      </div>
+  <div class="actions">
+    <button class="primary" type="button" onclick="saveKey()">Simpan API Key</button>
+    <button type="button" onclick="testConnection()">Test Connection</button>
+    <button type="button" onclick="clearKey()">Reset</button>
+  </div>
 
-      <div class="toast" id="connToast"></div>
-    </section>
+  <div class="toast" id="connToast"></div>
+</section>
 
     <!-- ADD -->
     <section class="card" id="cardAdd">
