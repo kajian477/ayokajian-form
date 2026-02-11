@@ -127,8 +127,8 @@
     </div>
 
     <div>
-      <label>API Key *</label>
-      <input id="apiKey" type="password" placeholder="Masukkan API key" />
+      <label>Kode Kuci*</label>
+      <input id="apiKey" type="password" placeholder="Masukkan Kode" />
     </div>
 
     <div>
@@ -137,8 +137,8 @@
   </div>
 
   <div class="actions">
-    <button class="primary" type="button" onclick="saveKey()">Simpan API Key</button>
-    <button type="button" onclick="testConnection()">Test Connection</button>
+    <button class="primary" type="button" onclick="saveKey()">Simpan Kode</button>
+    <button type="button" onclick="testConnection()">Menyambung</button>
     <button type="button" onclick="clearKey()">Reset</button>
   </div>
 
@@ -421,7 +421,7 @@
       try{ json = JSON.parse(text); }catch{ throw new Error("Healthcheck bukan JSON."); }
       if(!json.ok) throw new Error(json.message || "Healthcheck gagal.");
       setConnectedUI(true);
-      setToast("connToast", `Connected ✅\nSheet: ${json.data.sheetName}`);
+      setToast("connToast", `Tersambung ✅\nSheet: ${json.data.sheetName}`);
     }catch(err){
       setConnectedUI(false);
       setToast("connToast", err.message || String(err), false);
