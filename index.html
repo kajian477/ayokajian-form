@@ -3,21 +3,31 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Ayo Kajian — GitHub Admin</title>
+  <title>Ayo Kajian — Admin</title>
 
   <style>
     :root{
-      --bg:#f6f7fb; --card:#fff; --text:#0f172a; --muted:#64748b;
-      --border:#e2e8f0; --accent:#2563eb; --good:#16a34a; --bad:#ef4444;
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e2e8f0;
+      --accent:#2563eb;
+      --good:#16a34a;
+      --bad:#ef4444;
       --r:14px;
     }
     *{ box-sizing:border-box; }
     body{
-      margin:0; background:var(--bg); color:var(--text);
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      -webkit-text-size-adjust:100%;
     }
     header{
-      background:#fff; border-bottom:1px solid var(--border);
+      background:#fff;
+      border-bottom:1px solid var(--border);
       padding:12px 14px;
     }
     .title{ margin:0; font-weight:900; font-size:14px; }
@@ -38,29 +48,45 @@
     label{ display:block; font-size:12px; color:var(--muted); font-weight:800; margin:0 0 6px; }
 
     input, select, textarea{
-      width:100%; padding:12px 12px;
+      width:100%;
+      padding:12px 12px;
       border:1px solid var(--border);
       border-radius:12px;
-      background:#fff; color:var(--text);
-      outline:none; font-size:16px;
+      background:#fff;
+      color:var(--text);
+      outline:none;
+      font-size:16px;
     }
     textarea{ min-height:110px; resize:vertical; }
-    .row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
+    .row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
     .actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
     button{
       border:1px solid var(--border);
-      background:#fff; color:var(--text);
+      background:#fff;
+      color:var(--text);
       border-radius:12px;
       padding:12px 14px;
-      font-weight:900; font-size:14px;
+      font-weight:900;
+      font-size:14px;
       cursor:pointer;
     }
     button:disabled{ opacity:.6; cursor:not-allowed; }
     .primary{ border-color:transparent; background:var(--accent); color:#fff; }
+
     .toast{ margin-top:10px; font-size:13px; white-space:pre-line; }
     .toast.ok{ color:var(--good); }
     .toast.bad{ color:var(--bad); }
+
+    .pill{
+      display:inline-block;
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+    }
+    .pill.ok{ border-color:rgba(22,163,74,.25); color:var(--good); background:rgba(22,163,74,.06); }
+    .pill.bad{ border-color:rgba(239,68,68,.25); color:var(--bad); background:rgba(239,68,68,.06); }
 
     .result{
       border:1px solid var(--border);
@@ -75,16 +101,14 @@
     .mini{ padding:10px 12px; font-size:13px; border-radius:12px; }
 
     input[type="hidden"]{ display:none !important; }
-    .pill{ display:inline-block; font-size:12px; padding:6px 10px; border-radius:999px; border:1px solid var(--border); }
-    .pill.ok{ border-color:rgba(22,163,74,.25); color:var(--good); background:rgba(22,163,74,.06); }
-    .pill.bad{ border-color:rgba(239,68,68,.25); color:var(--bad); background:rgba(239,68,68,.06); }
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; color:var(--muted); word-break:break-all;}
   </style>
 </head>
 
 <body>
   <header>
-    <p class="title">Ayo Kajian — GitHub Admin</p>
-    <p class="sub">Tambah & Edit data kajian via Apps Script API</p>
+    <p class="title">Ayo Kajian — Admin (GitHub)</p>
+    <p class="sub">Script URL sudah dikunci. Admin cukup input API Key.</p>
   </header>
 
   <div class="wrap">
@@ -92,26 +116,28 @@
     <!-- CONNECTION -->
     <section class="card">
       <p class="cardTitle">Koneksi API</p>
-      <p class="cardHint">Isi Script URL & API Key. Disimpan di browser (localStorage).</p>
+      <p class="cardHint">API Key disimpan di browser (localStorage). Script URL sudah fixed.</p>
 
       <div class="grid">
         <div>
-          <label>Script URL (Web App /exec) *</label>
-          <input id="scriptUrl" placeholder="https://https://script.google.com/macros/s/AKfycbzZduW-XV6D9db50sZgF5ysGCi38ySz_SSTJN0FARA8QE-LUtg0SxoWr8pqJZJs8sUB/exec" />
+          <label>Script URL (fixed)</label>
+          <div class="mono" id="fixedUrl"></div>
         </div>
+
         <div>
           <label>API Key *</label>
           <input id="apiKey" type="password" placeholder="Masukkan API key" />
         </div>
+
         <div>
           <span id="connPill" class="pill bad">Not connected</span>
         </div>
       </div>
 
       <div class="actions">
-        <button class="primary" type="button" onclick="saveConfig()">Simpan</button>
+        <button class="primary" type="button" onclick="saveKey()">Simpan API Key</button>
         <button type="button" onclick="testConnection()">Test Connection</button>
-        <button type="button" onclick="clearConfig()">Reset</button>
+        <button type="button" onclick="clearKey()">Reset</button>
       </div>
 
       <div class="toast" id="connToast"></div>
@@ -203,7 +229,6 @@
 
       <form id="editForm" onsubmit="saveEdit(event)" style="margin-top:12px; display:none;">
         <input type="hidden" name="id" id="editId">
-
         <input type="hidden" name="mapsUrl" id="editMapsUrl" value="">
         <input type="hidden" name="streamUrl" id="editStreamUrl" value="">
         <input type="hidden" name="registerUrl" id="editRegisterUrl" value="">
@@ -268,6 +293,8 @@
   </div>
 
 <script>
+  // ======= FIXED URL (hardcoded) =======
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzZduW-XV6D9db50sZgF5ysGCi38ySz_SSTJN0FARA8QE-LUtg0SxoWr8pqJZJs8sUB/exec";
   const MODE = ["Offline","Online"];
   const el = (id)=>document.getElementById(id);
 
@@ -276,7 +303,6 @@
     t.className = "toast " + (ok ? "ok" : "bad");
     t.textContent = (ok ? "✅ " : "❌ ") + msg;
   }
-
   function setConnectedUI(isOk){
     const pill = el("connPill");
     pill.className = "pill " + (isOk ? "ok" : "bad");
@@ -336,45 +362,36 @@
     return obj;
   }
 
-  // ========= config =========
-  function loadConfig(){
-    el("scriptUrl").value = localStorage.getItem("AYOKAJIAN_SCRIPT") || "";
+  // ======= key storage =======
+  function loadKey(){
     el("apiKey").value = localStorage.getItem("AYOKAJIAN_KEY") || "";
   }
-
-  function saveConfig(){
-    const url = el("scriptUrl").value.trim();
+  function getKey(){
+    return (el("apiKey").value || localStorage.getItem("AYOKAJIAN_KEY") || "").trim();
+  }
+  function saveKey(){
     const key = el("apiKey").value.trim();
-    if(!url || !key){
-      setToast("connToast","Script URL & API Key wajib diisi.", false);
+    if(!key){
+      setToast("connToast","API Key wajib diisi.", false);
       setConnectedUI(false);
       return;
     }
-    localStorage.setItem("AYOKAJIAN_SCRIPT", url);
     localStorage.setItem("AYOKAJIAN_KEY", key);
-    setToast("connToast","Config tersimpan.");
+    setToast("connToast","API Key tersimpan.");
   }
-
-  function clearConfig(){
-    localStorage.removeItem("AYOKAJIAN_SCRIPT");
+  function clearKey(){
     localStorage.removeItem("AYOKAJIAN_KEY");
-    el("scriptUrl").value = "";
     el("apiKey").value = "";
     setConnectedUI(false);
-    setToast("connToast","Config direset.");
+    setToast("connToast","API Key direset.");
   }
 
-  function getScriptUrl(){ return (el("scriptUrl").value || localStorage.getItem("AYOKAJIAN_SCRIPT") || "").trim(); }
-  function getApiKey(){ return (el("apiKey").value || localStorage.getItem("AYOKAJIAN_KEY") || "").trim(); }
-
-  // ========= API =========
+  // ======= API calls =======
   async function callApi(action, data){
-    const url = getScriptUrl();
-    const key = getApiKey();
-    if(!url) throw new Error("Script URL kosong.");
-    if(!key) throw new Error("API Key kosong.");
+    const key = getKey();
+    if(!key) throw new Error("API Key kosong. Isi dulu di Koneksi API.");
 
-    const res = await fetch(url, {
+    const res = await fetch(SCRIPT_URL, {
       method:"POST",
       headers:{ "Content-Type":"text/plain;charset=utf-8" },
       body: JSON.stringify({ key, action, data })
@@ -383,23 +400,20 @@
     const text = await res.text();
     let json;
     try{ json = JSON.parse(text); }catch{ throw new Error("Response bukan JSON:\n" + text.slice(0,200)); }
-
     if(!json.ok) throw new Error(json.message || "API error.");
     return json.data;
   }
 
   async function testConnection(){
-    const url = getScriptUrl();
-    const key = getApiKey();
-    if(!url || !key){
-      setToast("connToast","Isi Script URL & API Key dulu.", false);
+    const key = getKey();
+    if(!key){
+      setToast("connToast","Isi API Key dulu.", false);
       setConnectedUI(false);
       return;
     }
-
     setToast("connToast","Testing connection...");
     try{
-      const res = await fetch(`${url}?key=${encodeURIComponent(key)}`);
+      const res = await fetch(`${SCRIPT_URL}?key=${encodeURIComponent(key)}`);
       const text = await res.text();
       let json;
       try{ json = JSON.parse(text); }catch{ throw new Error("Healthcheck bukan JSON."); }
@@ -412,7 +426,7 @@
     }
   }
 
-  // ========= ADD =========
+  // ======= ADD =======
   async function handleSubmit(e){
     e.preventDefault();
     const data = formToObj("form");
@@ -438,14 +452,13 @@
     }
   }
 
-  // ========= EDIT =========
+  // ======= EDIT =======
   function clearUstadz(){
     el("findUstadz").value = "";
     el("ustadzResults").innerHTML = "";
     el("ustadzToast").textContent = "";
     cancelEdit();
   }
-
   function cancelEdit(){
     el("editForm").style.display = "none";
     el("editToast").textContent = "";
@@ -482,7 +495,6 @@
         const safeTime = escapeHtml(r.time || "");
         const safeMode = escapeHtml(r.mode || "");
         const safePlace = escapeHtml(r.place || "");
-
         return `
           <div class="result">
             <p class="resultTitle">${safeTitle}</p>
@@ -531,11 +543,9 @@
     el("editTimeSelect").value = row.time || "";
     el("editPlace").value = row.place || "";
     el("editAddress").value = row.address || "";
-
     el("editMapsUrl").value = (row.mapsUrl || "");
     el("editStreamUrl").value = (row.streamUrl || "");
     el("editRegisterUrl").value = (row.registerUrl || "");
-
     el("editNotes").value = row.notes || "";
   }
 
@@ -568,14 +578,14 @@
   }
 
   // init
+  el("fixedUrl").textContent = SCRIPT_URL;
   fillSelect(el("mode"), MODE);
   fillSelect(el("editMode"), MODE);
   fillTimeSelect(el("timeSelect"), 30);
   fillTimeSelect(el("editTimeSelect"), 30);
   presetTime();
-  loadConfig();
+  loadKey();
   setConnectedUI(false);
 </script>
-
 </body>
 </html>
