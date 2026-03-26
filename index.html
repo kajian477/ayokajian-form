@@ -22,7 +22,7 @@
       margin:0;
       background:var(--bg);
       color:var(--text);
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       -webkit-text-size-adjust:100%;
     }
     header{
@@ -45,7 +45,15 @@
     .cardHint{ margin:4px 0 0; font-size:12px; color:var(--muted); }
 
     .grid{ display:grid; grid-template-columns:1fr; gap:10px; margin-top:10px; }
-    label{ display:block; font-size:12px; color:var(--muted); font-weight:800; margin:0 0 6px; }
+    .row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+    label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      font-weight:800;
+      margin:0 0 6px;
+    }
 
     input, select, textarea{
       width:100%;
@@ -57,10 +65,18 @@
       outline:none;
       font-size:16px;
     }
-    textarea{ min-height:110px; resize:vertical; }
+    textarea{
+      min-height:110px;
+      resize:vertical;
+    }
 
-    .row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-    .actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
     button{
       border:1px solid var(--border);
       background:#fff;
@@ -71,10 +87,21 @@
       font-size:14px;
       cursor:pointer;
     }
-    button:disabled{ opacity:.6; cursor:not-allowed; }
-    .primary{ border-color:transparent; background:var(--accent); color:#fff; }
+    button:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+    }
+    .primary{
+      border-color:transparent;
+      background:var(--accent);
+      color:#fff;
+    }
 
-    .toast{ margin-top:10px; font-size:13px; white-space:pre-line; }
+    .toast{
+      margin-top:10px;
+      font-size:13px;
+      white-space:pre-line;
+    }
     .toast.ok{ color:var(--good); }
     .toast.bad{ color:var(--bad); }
 
@@ -85,8 +112,16 @@
       border-radius:999px;
       border:1px solid var(--border);
     }
-    .pill.ok{ border-color:rgba(22,163,74,.25); color:var(--good); background:rgba(22,163,74,.06); }
-    .pill.bad{ border-color:rgba(239,68,68,.25); color:var(--bad); background:rgba(239,68,68,.06); }
+    .pill.ok{
+      border-color:rgba(22,163,74,.25);
+      color:var(--good);
+      background:rgba(22,163,74,.06);
+    }
+    .pill.bad{
+      border-color:rgba(239,68,68,.25);
+      color:var(--bad);
+      background:rgba(239,68,68,.06);
+    }
 
     .result{
       border:1px solid var(--border);
@@ -95,27 +130,50 @@
       margin-top:10px;
       background:#fff;
     }
-    .resultTitle{ margin:0 0 4px; font-weight:900; font-size:14px; }
-    .resultMeta{ margin:0; font-size:12px; color:var(--muted); line-height:1.35; }
-    .resultBtns{ margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; }
-    .mini{ padding:10px 12px; font-size:13px; border-radius:12px; }
+    .resultTitle{
+      margin:0 0 4px;
+      font-weight:900;
+      font-size:14px;
+    }
+    .resultMeta{
+      margin:0;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.35;
+    }
+    .resultBtns{
+      margin-top:10px;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .mini{
+      padding:10px 12px;
+      font-size:13px;
+      border-radius:12px;
+    }
 
     input[type="hidden"]{ display:none !important; }
-    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; color:var(--muted); word-break:break-all;}
+    .mono{
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+      font-size:12px;
+      color:var(--muted);
+      word-break:break-all;
+    }
   </style>
 </head>
 
 <body>
   <header>
     <p class="title">Ayo Kajian — Admin</p>
-    <p class="sub">Masukkan Kode, Kemudian Isi Jadwal Kajian.</p>
+    <p class="sub">Masukkan kode, lalu input atau edit jadwal kajian.</p>
   </header>
 
   <div class="wrap">
 
     <section class="card">
       <p class="cardTitle" style="display:none;">Koneksi API</p>
-      <p class="cardHint" style="display:none;">API Key disimpan di browser (localStorage). Script URL sudah fixed.</p>
+      <p class="cardHint" style="display:none;">API Key disimpan di browser. Script URL fixed.</p>
 
       <div class="grid">
         <div style="display:none;">
@@ -124,12 +182,12 @@
         </div>
 
         <div>
-          <label>Kode Kuci*</label>
-          <input id="apiKey" type="password" placeholder="Masukkan Kode" />
+          <label>Kode Kunci *</label>
+          <input id="apiKey" type="password" placeholder="Masukkan kode" />
         </div>
 
         <div>
-          <span id="connPill" class="pill bad">Not connected</span>
+          <span id="connPill" class="pill bad">Belum tersambung</span>
         </div>
       </div>
 
@@ -144,7 +202,7 @@
 
     <section class="card" id="cardAdd">
       <p class="cardTitle">Tambah Kajian</p>
-      <p class="cardHint">Input jadwal kajian.</p>
+      <p class="cardHint">Isi data kajian baru.</p>
 
       <form id="form" onsubmit="handleSubmit(event)">
         <input type="hidden" name="mapsUrl" value="">
@@ -168,8 +226,8 @@
           </div>
 
           <div>
-            <label>Mode *</label>
-            <select name="mode" id="mode" required></select>
+            <label>Mode</label>
+            <select name="mode" id="mode"></select>
           </div>
 
           <div class="row2">
@@ -210,11 +268,14 @@
 
     <section class="card" id="cardEditUstadz">
       <p class="cardTitle">Edit (By Ustadz)</p>
-      <p class="cardHint">Ketik nama ustadz → cari → pilih kajian.</p>
+      <p class="cardHint">Ketik nama ustadz, cari, lalu pilih data yang ingin diedit.</p>
 
       <label>Nama Ustadz</label>
-      <input id="findUstadz" placeholder="contoh: Ustadz Fulan"
-             onkeydown="if(event.key==='Enter'){event.preventDefault(); searchUstadz();}" />
+      <input
+        id="findUstadz"
+        placeholder="Contoh: Ustadz Fulan"
+        onkeydown="if(event.key==='Enter'){event.preventDefault(); searchUstadz();}"
+      />
 
       <div class="actions">
         <button class="primary" id="btnSearchU" type="button" onclick="searchUstadz()">Cari</button>
@@ -247,8 +308,8 @@
           </div>
 
           <div>
-            <label>Mode *</label>
-            <select name="mode" id="editMode" required></select>
+            <label>Mode</label>
+            <select name="mode" id="editMode"></select>
           </div>
 
           <div class="row2">
@@ -289,309 +350,375 @@
 
   </div>
 
-<script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxnswjC3rY-nQ7CAfKkTVGzb-0dLOWHumKov-rHibPE4P_LAoETBPmzkOO7Bw9CfY7X4A/exec";
-  const MODE = ["Offline","Online"];
-  const el = (id)=>document.getElementById(id);
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxnswjC3rY-nQ7CAfKkTVGzb-0dLOWHumKov-rHibPE4P_LAoETBPmzkOO7Bw9CfY7X4A/exec";
+    const MODE = ["Offline", "Online"];
+    const el = (id) => document.getElementById(id);
 
-  function setToast(id, msg, ok=true){
-    const t = el(id);
-    t.className = "toast " + (ok ? "ok" : "bad");
-    t.textContent = (ok ? "✅ " : "❌ ") + msg;
-  }
-  function setConnectedUI(isOk){
-    const pill = el("connPill");
-    pill.className = "pill " + (isOk ? "ok" : "bad");
-    pill.textContent = isOk ? "Tersambung" : "Belum Tersambung";
-  }
+    function setToast(id, msg, ok = true){
+      const t = el(id);
+      t.className = "toast " + (ok ? "ok" : "bad");
+      t.textContent = (ok ? "✅ " : "❌ ") + msg;
+    }
 
-  function fillSelect(selectEl, items, placeholder="-- pilih --"){
-    selectEl.innerHTML = "";
-    const opt0 = document.createElement("option");
-    opt0.value = ""; opt0.textContent = placeholder;
-    selectEl.appendChild(opt0);
-    items.forEach(v=>{
-      const o=document.createElement("option");
-      o.value=v; o.textContent=v;
-      selectEl.appendChild(o);
-    });
-  }
+    function setConnectedUI(isOk){
+      const pill = el("connPill");
+      pill.className = "pill " + (isOk ? "ok" : "bad");
+      pill.textContent = isOk ? "Tersambung" : "Belum tersambung";
+    }
 
-  function fillTimeSelect(selectEl, step=30){
-    selectEl.innerHTML = '<option value="">-- pilih --</option>';
-    for(let h=0; h<24; h++){
-      for(let m=0; m<60; m+=step){
-        const hh = String(h).padStart(2,'0');
-        const mm = String(m).padStart(2,'0');
-        const val = `${hh}:${mm}`;
-        const opt = document.createElement("option");
-        opt.value = val;
-        opt.textContent = val;
-        selectEl.appendChild(opt);
+    function fillSelect(selectEl, items, placeholder = "-- pilih --"){
+      selectEl.innerHTML = "";
+      const opt0 = document.createElement("option");
+      opt0.value = "";
+      opt0.textContent = placeholder;
+      selectEl.appendChild(opt0);
+
+      items.forEach(v => {
+        const o = document.createElement("option");
+        o.value = v;
+        o.textContent = v;
+        selectEl.appendChild(o);
+      });
+    }
+
+    function fillTimeSelect(selectEl, step = 30){
+      selectEl.innerHTML = '<option value="">-- pilih --</option>';
+      for (let h = 0; h < 24; h++){
+        for (let m = 0; m < 60; m += step){
+          const hh = String(h).padStart(2, "0");
+          const mm = String(m).padStart(2, "0");
+          const val = `${hh}:${mm}`;
+          const opt = document.createElement("option");
+          opt.value = val;
+          opt.textContent = val;
+          selectEl.appendChild(opt);
+        }
       }
     }
-  }
 
-  function presetTime(){
-    const d = new Date();
-    const step = 30;
-    let h = d.getHours();
-    let m = d.getMinutes();
-    m = Math.ceil((m+1)/step)*step;
-    if (m >= 60){ m = 0; h = (h+1) % 24; }
-    el("timeSelect").value = String(h).padStart(2,'0') + ":" + String(m).padStart(2,'0');
-  }
-
-  function resetForm(){
-    el("form").reset();
-    fillSelect(el("mode"), MODE);
-    presetTime();
-    setToast("toast","Form direset.");
-  }
-
-  function formToObj(formId){
-    const fd = new FormData(el(formId));
-    const obj = Object.fromEntries(fd.entries());
-    Object.keys(obj).forEach(k=>{
-      if (typeof obj[k] === "string") obj[k] = obj[k].trim();
-    });
-    return obj;
-  }
-
-  function loadKey(){
-    el("apiKey").value = localStorage.getItem("AYOKAJIAN_KEY") || "";
-  }
-  function getKey(){
-    return (el("apiKey").value || localStorage.getItem("AYOKAJIAN_KEY") || "").trim();
-  }
-  function saveKey(){
-    const key = el("apiKey").value.trim();
-    if(!key){
-      setToast("connToast","Kode wajib diisi.", false);
-      setConnectedUI(false);
-      return;
-    }
-    localStorage.setItem("AYOKAJIAN_KEY", key);
-    setToast("connToast","Kode telah tersimpan.");
-  }
-  function clearKey(){
-    localStorage.removeItem("AYOKAJIAN_KEY");
-    el("apiKey").value = "";
-    setConnectedUI(false);
-    setToast("connToast","Kode telah direset.");
-  }
-
-  async function callApi(action, data){
-    const key = getKey();
-    if(!key) throw new Error("Kode masih kosong. Isi dulu kode kemudian klik menyambung.");
-
-    const res = await fetch(SCRIPT_URL, {
-      method:"POST",
-      headers:{ "Content-Type":"text/plain;charset=utf-8" },
-      body: JSON.stringify({ key, action, data })
-    });
-
-    const text = await res.text();
-    let json;
-    try{ json = JSON.parse(text); }catch{ throw new Error("Response bukan JSON:\n" + text.slice(0,200)); }
-    if(!json.ok) throw new Error(json.message || "API error.");
-    return json.data;
-  }
-
-  async function testConnection(){
-    const key = getKey();
-    if(!key){
-      setToast("connToast","Isi kode dulu.", false);
-      setConnectedUI(false);
-      return;
-    }
-    setToast("connToast","Sedang Menyambung...");
-    try{
-      const res = await fetch(`${SCRIPT_URL}?key=${encodeURIComponent(key)}`);
-      const text = await res.text();
-      let json;
-      try{ json = JSON.parse(text); }catch{ throw new Error("Healthcheck bukan JSON."); }
-      if(!json.ok) throw new Error(json.message || "Healthcheck gagal.");
-      setConnectedUI(true);
-      setToast("connToast", `Tersambung ✅\nDatabase: ${json.data.sheetName}`);
-    }catch(err){
-      setConnectedUI(false);
-      setToast("connToast", err.message || String(err), false);
-    }
-  }
-
-  async function handleSubmit(e){
-    e.preventDefault();
-    const data = formToObj("form");
-
-    if ((data.title || "").length < 3) {
-      setToast("toast","Judul minimal 3 karakter.", false);
-      return;
+    function presetTime(){
+      const d = new Date();
+      const step = 30;
+      let h = d.getHours();
+      let m = d.getMinutes();
+      m = Math.ceil((m + 1) / step) * step;
+      if (m >= 60){
+        m = 0;
+        h = (h + 1) % 24;
+      }
+      el("timeSelect").value = String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0");
     }
 
-    if ((data.topic || "").length > 0 && (data.topic || "").length < 3) {
-      setToast("toast","Topik minimal 3 karakter jika diisi.", false);
-      return;
-    }
-
-    el("btnSave").disabled = true;
-    setToast("toast","Menyimpan...");
-
-    try{
-      await callApi("submitForm", data);
-      el("btnSave").disabled = false;
+    function resetForm(){
       el("form").reset();
       fillSelect(el("mode"), MODE);
       presetTime();
-      setToast("toast","Tersimpan!");
-    }catch(err){
-      el("btnSave").disabled = false;
-      setToast("toast", err.message || String(err), false);
-    }
-  }
-
-  function clearUstadz(){
-    el("findUstadz").value = "";
-    el("ustadzResults").innerHTML = "";
-    el("ustadzToast").textContent = "";
-    cancelEdit();
-  }
-  function cancelEdit(){
-    el("editForm").style.display = "none";
-    el("editToast").textContent = "";
-  }
-
-  async function searchUstadz(){
-    const name = (el("findUstadz").value || "").trim();
-    if(!name){
-      setToast("ustadzToast","Masukkan nama ustadz dulu.", false);
-      return;
+      setToast("toast", "Form direset.");
     }
 
-    el("btnSearchU").disabled = true;
-    setToast("ustadzToast","Mencari...");
-    el("ustadzResults").innerHTML = "";
-    cancelEdit();
+    function formToObj(formId){
+      const fd = new FormData(el(formId));
+      const obj = Object.fromEntries(fd.entries());
+      Object.keys(obj).forEach(k => {
+        if (typeof obj[k] === "string") obj[k] = obj[k].trim();
+      });
+      return obj;
+    }
 
-    try{
-      const rows = await callApi("getByUstadz", { name });
-      el("btnSearchU").disabled = false;
+    function loadKey(){
+      el("apiKey").value = localStorage.getItem("AYOKAJIAN_KEY") || "";
+    }
 
-      const arr = rows || [];
-      if(!arr.length){
-        setToast("ustadzToast","Tidak ada data yang cocok.", false);
+    function getKey(){
+      return (el("apiKey").value || localStorage.getItem("AYOKAJIAN_KEY") || "").trim();
+    }
+
+    function saveKey(){
+      const key = el("apiKey").value.trim();
+      if (!key){
+        setToast("connToast", "Kode wajib diisi.", false);
+        setConnectedUI(false);
+        return;
+      }
+      localStorage.setItem("AYOKAJIAN_KEY", key);
+      setToast("connToast", "Kode telah tersimpan.");
+    }
+
+    function clearKey(){
+      localStorage.removeItem("AYOKAJIAN_KEY");
+      el("apiKey").value = "";
+      setConnectedUI(false);
+      setToast("connToast", "Kode telah direset.");
+    }
+
+    async function callApi(action, data){
+      const key = getKey();
+      if (!key) throw new Error("Kode masih kosong. Isi dulu kode lalu klik menyambung.");
+
+      const res = await fetch(SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ key, action, data })
+      });
+
+      const text = await res.text();
+      let json;
+      try {
+        json = JSON.parse(text);
+      } catch {
+        throw new Error("Response bukan JSON:\n" + text.slice(0, 200));
+      }
+
+      if (!json.ok) throw new Error(json.message || "API error.");
+      return json.data;
+    }
+
+    async function testConnection(){
+      const key = getKey();
+      if (!key){
+        setToast("connToast", "Isi kode dulu.", false);
+        setConnectedUI(false);
         return;
       }
 
-      setToast("ustadzToast", `Ketemu ${arr.length} data. Pilih untuk edit.`);
-      el("ustadzResults").innerHTML = arr.map(r=>{
-        const safeTitle = escapeHtml(r.title || "");
-        const safeU = escapeHtml(r.ustadz || "");
-        const safeTopic = escapeHtml(r.topic || "");
-        const safeDate = escapeHtml(r.date || "");
-        const safeTime = escapeHtml(r.time || "");
-        const safeMode = escapeHtml(r.mode || "");
-        const safePlace = escapeHtml(r.place || "");
-        return `
-          <div class="result">
-            <p class="resultTitle">${safeTitle}</p>
-            <p class="resultMeta">${safeU} • ${safeTopic}</p>
-            <p class="resultMeta">${safeDate} ${safeTime} • ${safeMode} • ${safePlace}</p>
-            <div class="resultBtns">
-              <button type="button" class="mini primary" onclick='pickFromUstadz("${escapeAttr(r.id)}")'>Edit</button>
+      setToast("connToast", "Sedang menyambung...");
+      try{
+        const res = await fetch(`${SCRIPT_URL}?key=${encodeURIComponent(key)}`);
+        const text = await res.text();
+
+        let json;
+        try {
+          json = JSON.parse(text);
+        } catch {
+          throw new Error("Health check bukan JSON.");
+        }
+
+        if (!json.ok) throw new Error(json.message || "Health check gagal.");
+
+        setConnectedUI(true);
+        setToast("connToast", `Tersambung ✅\nDatabase: ${json.data.sheetName}`);
+      } catch(err){
+        setConnectedUI(false);
+        setToast("connToast", err.message || String(err), false);
+      }
+    }
+
+    async function handleSubmit(e){
+      e.preventDefault();
+      const data = formToObj("form");
+
+      if ((data.title || "").length < 3){
+        setToast("toast", "Judul minimal 3 karakter.", false);
+        return;
+      }
+
+      if ((data.topic || "").length > 0 && (data.topic || "").length < 3){
+        setToast("toast", "Topik minimal 3 karakter jika diisi.", false);
+        return;
+      }
+
+      if (!(data.ustadz || "")){
+        setToast("toast", "Nama Ustadz wajib diisi.", false);
+        return;
+      }
+
+      if (!(data.date || "")){
+        setToast("toast", "Tanggal wajib diisi.", false);
+        return;
+      }
+
+      if (!(data.time || "")){
+        setToast("toast", "Waktu wajib diisi.", false);
+        return;
+      }
+
+      el("btnSave").disabled = true;
+      setToast("toast", "Menyimpan...");
+
+      try{
+        await callApi("submitForm", data);
+        el("btnSave").disabled = false;
+        el("form").reset();
+        fillSelect(el("mode"), MODE);
+        presetTime();
+        setToast("toast", "Tersimpan!");
+      } catch(err){
+        el("btnSave").disabled = false;
+        setToast("toast", err.message || String(err), false);
+      }
+    }
+
+    function clearUstadz(){
+      el("findUstadz").value = "";
+      el("ustadzResults").innerHTML = "";
+      el("ustadzToast").textContent = "";
+      cancelEdit();
+    }
+
+    function cancelEdit(){
+      el("editForm").style.display = "none";
+      el("editToast").textContent = "";
+    }
+
+    async function searchUstadz(){
+      const name = (el("findUstadz").value || "").trim();
+      if (!name){
+        setToast("ustadzToast", "Masukkan nama ustadz dulu.", false);
+        return;
+      }
+
+      el("btnSearchU").disabled = true;
+      setToast("ustadzToast", "Mencari...");
+      el("ustadzResults").innerHTML = "";
+      cancelEdit();
+
+      try{
+        const rows = await callApi("getByUstadz", { name });
+        el("btnSearchU").disabled = false;
+
+        const arr = rows || [];
+        if (!arr.length){
+          setToast("ustadzToast", "Tidak ada data yang cocok.", false);
+          return;
+        }
+
+        setToast("ustadzToast", `Ketemu ${arr.length} data. Pilih untuk edit.`);
+        el("ustadzResults").innerHTML = arr.map(r => {
+          const safeTitle = escapeHtml(r.title || "");
+          const safeU = escapeHtml(r.ustadz || "");
+          const safeTopic = escapeHtml(r.topic || "");
+          const safeDate = escapeHtml(r.date || "");
+          const safeTime = escapeHtml(r.time || "");
+          const safeMode = escapeHtml(r.mode || "");
+          const safePlace = escapeHtml(r.place || "");
+
+          return `
+            <div class="result">
+              <p class="resultTitle">${safeTitle}</p>
+              <p class="resultMeta">${safeU}${safeTopic ? " • " + safeTopic : ""}</p>
+              <p class="resultMeta">${safeDate} ${safeTime}${safeMode ? " • " + safeMode : ""}${safePlace ? " • " + safePlace : ""}</p>
+              <div class="resultBtns">
+                <button type="button" class="mini primary" onclick='pickFromUstadz("${escapeAttr(r.id)}")'>Edit</button>
+              </div>
             </div>
-          </div>
-        `;
-      }).join("");
-    }catch(err){
-      el("btnSearchU").disabled = false;
-      setToast("ustadzToast", err.message || String(err), false);
+          `;
+        }).join("");
+      } catch(err){
+        el("btnSearchU").disabled = false;
+        setToast("ustadzToast", err.message || String(err), false);
+      }
     }
-  }
 
-  async function pickFromUstadz(id){
-    const clean = (id || "").trim();
-    if(!clean) return;
+    async function pickFromUstadz(id){
+      const clean = (id || "").trim();
+      if (!clean) return;
 
-    setToast("ustadzToast","Loading data untuk edit...");
+      setToast("ustadzToast", "Loading data untuk edit...");
 
-    try{
-      const row = await callApi("getById", { id: clean });
-      if(!row || !row.id){
-        setToast("ustadzToast","Data tidak ditemukan.", false);
+      try{
+        const row = await callApi("getById", { id: clean });
+        if (!row || !row.id){
+          setToast("ustadzToast", "Data tidak ditemukan.", false);
+          return;
+        }
+
+        loadRowToEdit(row);
+        el("editForm").style.display = "block";
+        setToast("ustadzToast", "Data siap diedit.");
+        el("editForm").scrollIntoView({ behavior: "smooth", block: "start" });
+      } catch(err){
+        setToast("ustadzToast", err.message || String(err), false);
+      }
+    }
+
+    function loadRowToEdit(row){
+      el("editId").value = row.id || "";
+      el("editTitle").value = row.title || "";
+      el("editUstadz").value = row.ustadz || "";
+      el("editTopic").value = row.topic || "";
+      el("editMode").value = row.mode || "";
+      el("editDate").value = row.date || "";
+      el("editTimeSelect").value = row.time || "";
+      el("editPlace").value = row.place || "";
+      el("editAddress").value = row.address || "";
+      el("editMapsUrl").value = row.mapsUrl || "";
+      el("editStreamUrl").value = row.streamUrl || "";
+      el("editRegisterUrl").value = row.registerUrl || "";
+      el("editNotes").value = row.notes || "";
+    }
+
+    async function saveEdit(e){
+      e.preventDefault();
+      const payload = formToObj("editForm");
+
+      if (!payload.id){
+        setToast("editToast", "ID internal kosong.", false);
         return;
       }
-      loadRowToEdit(row);
-      el("editForm").style.display = "block";
-      setToast("ustadzToast","Data siap diedit.");
-      el("editForm").scrollIntoView({behavior:"smooth", block:"start"});
-    }catch(err){
-      setToast("ustadzToast", err.message || String(err), false);
-    }
-  }
 
-  function loadRowToEdit(row){
-    el("editId").value = row.id || "";
-    el("editTitle").value = row.title || "";
-    el("editUstadz").value = row.ustadz || "";
-    el("editTopic").value = row.topic || "";
-    el("editMode").value = row.mode || "";
-    el("editDate").value = row.date || "";
-    el("editTimeSelect").value = row.time || "";
-    el("editPlace").value = row.place || "";
-    el("editAddress").value = row.address || "";
-    el("editMapsUrl").value = (row.mapsUrl || "");
-    el("editStreamUrl").value = (row.streamUrl || "");
-    el("editRegisterUrl").value = (row.registerUrl || "");
-    el("editNotes").value = row.notes || "";
-  }
+      if ((payload.title || "").length < 3){
+        setToast("editToast", "Judul minimal 3 karakter.", false);
+        return;
+      }
 
-  async function saveEdit(e){
-    e.preventDefault();
-    const payload = formToObj("editForm");
-    if(!payload.id){
-      setToast("editToast","ID internal kosong.", false);
-      return;
-    }
+      if ((payload.topic || "").length > 0 && (payload.topic || "").length < 3){
+        setToast("editToast", "Topik minimal 3 karakter jika diisi.", false);
+        return;
+      }
 
-    if ((payload.title || "").length < 3) {
-      setToast("editToast","Judul minimal 3 karakter.", false);
-      return;
-    }
+      if (!(payload.ustadz || "")){
+        setToast("editToast", "Nama Ustadz wajib diisi.", false);
+        return;
+      }
 
-    if ((payload.topic || "").length > 0 && (payload.topic || "").length < 3) {
-      setToast("editToast","Topik minimal 3 karakter jika diisi.", false);
-      return;
+      if (!(payload.date || "")){
+        setToast("editToast", "Tanggal wajib diisi.", false);
+        return;
+      }
+
+      if (!(payload.time || "")){
+        setToast("editToast", "Waktu wajib diisi.", false);
+        return;
+      }
+
+      el("btnUpdate").disabled = true;
+      setToast("editToast", "Menyimpan...");
+
+      try{
+        await callApi("updateById", payload);
+        el("btnUpdate").disabled = false;
+        setToast("editToast", "Tersimpan!");
+      } catch(err){
+        el("btnUpdate").disabled = false;
+        setToast("editToast", err.message || String(err), false);
+      }
     }
 
-    el("btnUpdate").disabled = true;
-    setToast("editToast","Menyimpan...");
-
-    try{
-      await callApi("updateById", payload);
-      el("btnUpdate").disabled = false;
-      setToast("editToast","Tersimpan!");
-    }catch(err){
-      el("btnUpdate").disabled = false;
-      setToast("editToast", err.message || String(err), false);
+    function escapeHtml(s){
+      return String(s ?? "").replace(/[&<>"']/g, m => ({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        "\"":"&quot;",
+        "'":"&#39;"
+      }[m]));
     }
-  }
 
-  function escapeHtml(s){
-    return String(s ?? "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-  }
-  function escapeAttr(s){
-    return String(s ?? "").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
-  }
+    function escapeAttr(s){
+      return String(s ?? "")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
 
-  el("fixedUrl").textContent = SCRIPT_URL;
-  fillSelect(el("mode"), MODE);
-  fillSelect(el("editMode"), MODE);
-  fillTimeSelect(el("timeSelect"), 30);
-  fillTimeSelect(el("editTimeSelect"), 30);
-  presetTime();
-  loadKey();
-  setConnectedUI(false);
-</script>
+    el("fixedUrl").textContent = SCRIPT_URL;
+    fillSelect(el("mode"), MODE);
+    fillSelect(el("editMode"), MODE);
+    fillTimeSelect(el("timeSelect"), 30);
+    fillTimeSelect(el("editTimeSelect"), 30);
+    presetTime();
+    loadKey();
+    setConnectedUI(false);
+  </script>
 </body>
 </html>
