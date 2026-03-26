@@ -113,39 +113,35 @@
 
   <div class="wrap">
 
-    <!-- CONNECTION -->
     <section class="card">
-  <!-- Judul & deskripsi disembunyikan -->
-  <p class="cardTitle" style="display:none;">Koneksi API</p>
-  <p class="cardHint" style="display:none;">API Key disimpan di browser (localStorage). Script URL sudah fixed.</p>
+      <p class="cardTitle" style="display:none;">Koneksi API</p>
+      <p class="cardHint" style="display:none;">API Key disimpan di browser (localStorage). Script URL sudah fixed.</p>
 
-  <div class="grid">
-    <!-- Script URL disembunyikan -->
-    <div style="display:none;">
-      <label>Script URL (fixed)</label>
-      <div class="mono" id="fixedUrl"></div>
-    </div>
+      <div class="grid">
+        <div style="display:none;">
+          <label>Script URL (fixed)</label>
+          <div class="mono" id="fixedUrl"></div>
+        </div>
 
-    <div>
-      <label>Kode Kuci*</label>
-      <input id="apiKey" type="password" placeholder="Masukkan Kode" />
-    </div>
+        <div>
+          <label>Kode Kuci*</label>
+          <input id="apiKey" type="password" placeholder="Masukkan Kode" />
+        </div>
 
-    <div>
-      <span id="connPill" class="pill bad">Not connected</span>
-    </div>
-  </div>
+        <div>
+          <span id="connPill" class="pill bad">Not connected</span>
+        </div>
+      </div>
 
-  <div class="actions">
-    <button class="primary" type="button" onclick="saveKey()">Simpan Kode</button>
-    <button type="button" onclick="testConnection()">Menyambung</button>
-    <button type="button" onclick="clearKey()">Reset</button>
-  </div>
+      <div class="actions">
+        <button class="primary" type="button" onclick="saveKey()">Simpan Kode</button>
+        <button type="button" onclick="testConnection()">Menyambung</button>
+        <button type="button" onclick="clearKey()">Reset</button>
+      </div>
 
-  <div class="toast" id="connToast"></div>
-</section>
+      <div class="toast" id="connToast"></div>
+    </section>
 
-    <!-- ADD -->
     <section class="card" id="cardAdd">
       <p class="cardTitle">Tambah Kajian</p>
       <p class="cardHint">Input jadwal kajian.</p>
@@ -167,8 +163,8 @@
           </div>
 
           <div>
-            <label>Tema/Topik *</label>
-            <input name="topic" required placeholder="Tema/topik" />
+            <label>Tema/Topik</label>
+            <input name="topic" placeholder="Tema/topik (opsional)" />
           </div>
 
           <div>
@@ -212,7 +208,6 @@
       </form>
     </section>
 
-    <!-- EDIT -->
     <section class="card" id="cardEditUstadz">
       <p class="cardTitle">Edit (By Ustadz)</p>
       <p class="cardHint">Ketik nama ustadz → cari → pilih kajian.</p>
@@ -247,8 +242,8 @@
           </div>
 
           <div>
-            <label>Tema/Topik *</label>
-            <input name="topic" id="editTopic" required />
+            <label>Tema/Topik</label>
+            <input name="topic" id="editTopic" placeholder="Tema/topik (opsional)" />
           </div>
 
           <div>
@@ -295,7 +290,6 @@
   </div>
 
 <script>
-  // ======= FIXED URL (hardcoded) =======
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxnswjC3rY-nQ7CAfKkTVGzb-0dLOWHumKov-rHibPE4P_LAoETBPmzkOO7Bw9CfY7X4A/exec";
   const MODE = ["Offline","Online"];
   const el = (id)=>document.getElementById(id);
@@ -364,7 +358,6 @@
     return obj;
   }
 
-  // ======= key storage =======
   function loadKey(){
     el("apiKey").value = localStorage.getItem("AYOKAJIAN_KEY") || "";
   }
@@ -388,7 +381,6 @@
     setToast("connToast","Kode telah direset.");
   }
 
-  // ======= API calls =======
   async function callApi(action, data){
     const key = getKey();
     if(!key) throw new Error("Kode masih kosong. Isi dulu kode kemudian klik menyambung.");
@@ -428,13 +420,17 @@
     }
   }
 
-  // ======= ADD =======
   async function handleSubmit(e){
     e.preventDefault();
     const data = formToObj("form");
 
-    if ((data.title||"").length < 3 || (data.topic||"").length < 3) {
-      setToast("toast","Judul & Topik minimal 3 karakter.", false);
+    if ((data.title || "").length < 3) {
+      setToast("toast","Judul minimal 3 karakter.", false);
+      return;
+    }
+
+    if ((data.topic || "").length > 0 && (data.topic || "").length < 3) {
+      setToast("toast","Topik minimal 3 karakter jika diisi.", false);
       return;
     }
 
@@ -454,7 +450,6 @@
     }
   }
 
-  // ======= EDIT =======
   function clearUstadz(){
     el("findUstadz").value = "";
     el("ustadzResults").innerHTML = "";
@@ -559,6 +554,16 @@
       return;
     }
 
+    if ((payload.title || "").length < 3) {
+      setToast("editToast","Judul minimal 3 karakter.", false);
+      return;
+    }
+
+    if ((payload.topic || "").length > 0 && (payload.topic || "").length < 3) {
+      setToast("editToast","Topik minimal 3 karakter jika diisi.", false);
+      return;
+    }
+
     el("btnUpdate").disabled = true;
     setToast("editToast","Menyimpan...");
 
@@ -579,7 +584,6 @@
     return String(s ?? "").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
   }
 
-  // init
   el("fixedUrl").textContent = SCRIPT_URL;
   fillSelect(el("mode"), MODE);
   fillSelect(el("editMode"), MODE);
