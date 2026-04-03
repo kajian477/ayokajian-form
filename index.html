@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Daftar Kajian — Admin</title>
-<link rel="icon" type="image/png" href="favicon.png">
+  <link rel="icon" type="image/png" href="favicon.png">
   <style>
     :root{
       --bg:#f6f7fb;
@@ -205,7 +205,6 @@
       <p class="cardHint">Isi data kajian baru.</p>
 
       <form id="form" onsubmit="handleSubmit(event)">
-        <input type="hidden" name="mapsUrl" value="">
         <input type="hidden" name="streamUrl" value="">
         <input type="hidden" name="registerUrl" value="">
 
@@ -242,13 +241,18 @@
           </div>
 
           <div>
-            <label>Tempat/Lokasi</label>
+            <label>Nama Masjid</label>
             <input name="place" placeholder="Contoh: Masjid Ahmad Yani" />
           </div>
 
           <div>
             <label>Alamat</label>
             <input name="address" placeholder="Contoh: Mulyorejo - Surabaya" />
+          </div>
+
+          <div>
+            <label>Link Peta (Google Maps)</label>
+            <input name="mapsUrl" placeholder="https://maps.app.goo.gl/..." />
           </div>
 
           <div>
@@ -284,10 +288,34 @@
 
       <div class="toast" id="ustadzToast"></div>
       <div id="ustadzResults"></div>
+    </section>
+
+    <section class="card" id="cardEditPlace">
+      <p class="cardTitle">Edit (By Masjid/Tempat)</p>
+      <p class="cardHint">Ketik nama masjid atau tempat, cari, lalu pilih data yang ingin diedit.</p>
+
+      <label>Nama Masjid / Tempat</label>
+      <input
+        id="findPlace"
+        placeholder="Contoh: Masjid Ahmad Yani"
+        onkeydown="if(event.key==='Enter'){event.preventDefault(); searchPlace();}"
+      />
+
+      <div class="actions">
+        <button class="primary" id="btnSearchP" type="button" onclick="searchPlace()">Cari</button>
+        <button type="button" onclick="clearPlace()">Clear</button>
+      </div>
+
+      <div class="toast" id="placeToast"></div>
+      <div id="placeResults"></div>
+    </section>
+
+    <section class="card">
+      <p class="cardTitle">Form Edit</p>
+      <p class="cardHint">Form ini akan otomatis terisi setelah kamu memilih data dari hasil pencarian.</p>
 
       <form id="editForm" onsubmit="saveEdit(event)" style="margin-top:12px; display:none;">
         <input type="hidden" name="id" id="editId">
-        <input type="hidden" name="mapsUrl" id="editMapsUrl" value="">
         <input type="hidden" name="streamUrl" id="editStreamUrl" value="">
         <input type="hidden" name="registerUrl" id="editRegisterUrl" value="">
 
@@ -324,13 +352,18 @@
           </div>
 
           <div>
-            <label>Tempat/Lokasi</label>
-            <input name="place" id="editPlace" />
+            <label>Nama Masjid</label>
+            <input name="place" id="editPlace" placeholder="Contoh: Masjid Ahmad Yani" />
           </div>
 
           <div>
             <label>Alamat</label>
             <input name="address" id="editAddress" />
+          </div>
+
+          <div>
+            <label>Link Peta (Google Maps)</label>
+            <input name="mapsUrl" id="editMapsUrl" placeholder="https://maps.app.goo.gl/..." />
           </div>
 
           <div>
@@ -556,6 +589,13 @@
       cancelEdit();
     }
 
+    function clearPlace(){
+      el("findPlace").value = "";
+      el("placeResults").innerHTML = "";
+      el("placeToast").textContent = "";
+      cancelEdit();
+    }
+
     function cancelEdit(){
       el("editForm").style.display = "none";
       el("editToast").textContent = "";
@@ -584,51 +624,91 @@
         }
 
         setToast("ustadzToast", `Ketemu ${arr.length} data. Pilih untuk edit.`);
-        el("ustadzResults").innerHTML = arr.map(r => {
-          const safeTitle = escapeHtml(r.title || "");
-          const safeU = escapeHtml(r.ustadz || "");
-          const safeTopic = escapeHtml(r.topic || "");
-          const safeDate = escapeHtml(r.date || "");
-          const safeTime = escapeHtml(r.time || "");
-          const safeMode = escapeHtml(r.mode || "");
-          const safePlace = escapeHtml(r.place || "");
-
-          return `
-            <div class="result">
-              <p class="resultTitle">${safeTitle}</p>
-              <p class="resultMeta">${safeU}${safeTopic ? " • " + safeTopic : ""}</p>
-              <p class="resultMeta">${safeDate} ${safeTime}${safeMode ? " • " + safeMode : ""}${safePlace ? " • " + safePlace : ""}</p>
-              <div class="resultBtns">
-                <button type="button" class="mini primary" onclick='pickFromUstadz("${escapeAttr(r.id)}")'>Edit</button>
-              </div>
-            </div>
-          `;
-        }).join("");
+        el("ustadzResults").innerHTML = arr.map(r => renderResultCard(r, "pickFromUstadz")).join("");
       } catch(err){
         el("btnSearchU").disabled = false;
         setToast("ustadzToast", err.message || String(err), false);
       }
     }
 
+    async function searchPlace(){
+      const name = (el("findPlace").value || "").trim();
+      if (!name){
+        setToast("placeToast", "Masukkan nama masjid atau tempat dulu.", false);
+        return;
+      }
+
+      el("btnSearchP").disabled = true;
+      setToast("placeToast", "Mencari...");
+      el("placeResults").innerHTML = "";
+      cancelEdit();
+
+      try{
+        const rows = await callApi("getByPlace", { name });
+        el("btnSearchP").disabled = false;
+
+        const arr = rows || [];
+        if (!arr.length){
+          setToast("placeToast", "Tidak ada data yang cocok.", false);
+          return;
+        }
+
+        setToast("placeToast", `Ketemu ${arr.length} data. Pilih untuk edit.`);
+        el("placeResults").innerHTML = arr.map(r => renderResultCard(r, "pickFromPlace")).join("");
+      } catch(err){
+        el("btnSearchP").disabled = false;
+        setToast("placeToast", err.message || String(err), false);
+      }
+    }
+
+    function renderResultCard(r, fnName){
+      const safeTitle = escapeHtml(r.title || "");
+      const safeU = escapeHtml(r.ustadz || "");
+      const safeTopic = escapeHtml(r.topic || "");
+      const safeDate = escapeHtml(r.date || "");
+      const safeTime = escapeHtml(r.time || "");
+      const safeMode = escapeHtml(r.mode || "");
+      const safePlace = escapeHtml(r.place || "");
+
+      return `
+        <div class="result">
+          <p class="resultTitle">${safeTitle}</p>
+          <p class="resultMeta">${safeU}${safeTopic ? " • " + safeTopic : ""}</p>
+          <p class="resultMeta">${safeDate} ${safeTime}${safeMode ? " • " + safeMode : ""}${safePlace ? " • " + safePlace : ""}</p>
+          <div class="resultBtns">
+            <button type="button" class="mini primary" onclick='${fnName}("${escapeAttr(r.id)}")'>Edit</button>
+          </div>
+        </div>
+      `;
+    }
+
     async function pickFromUstadz(id){
+      await loadEditById(id, "ustadzToast");
+    }
+
+    async function pickFromPlace(id){
+      await loadEditById(id, "placeToast");
+    }
+
+    async function loadEditById(id, toastId){
       const clean = (id || "").trim();
       if (!clean) return;
 
-      setToast("ustadzToast", "Loading data untuk edit...");
+      setToast(toastId, "Loading data untuk edit...");
 
       try{
         const row = await callApi("getById", { id: clean });
         if (!row || !row.id){
-          setToast("ustadzToast", "Data tidak ditemukan.", false);
+          setToast(toastId, "Data tidak ditemukan.", false);
           return;
         }
 
         loadRowToEdit(row);
         el("editForm").style.display = "block";
-        setToast("ustadzToast", "Data siap diedit.");
+        setToast(toastId, "Data siap diedit.");
         el("editForm").scrollIntoView({ behavior: "smooth", block: "start" });
       } catch(err){
-        setToast("ustadzToast", err.message || String(err), false);
+        setToast(toastId, err.message || String(err), false);
       }
     }
 
